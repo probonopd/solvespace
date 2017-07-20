@@ -1,6 +1,7 @@
 #!/bin/sh -xe
 
-if echo $TRAVIS_TAG | grep ^v; then BUILD_TYPE=RelWithDebInfo; else BUILD_TYPE=Debug; fi
+# if echo $TRAVIS_TAG | grep ^v; then BUILD_TYPE=RelWithDebInfo; else BUILD_TYPE=Debug; fi
+BUILD_TYPE=Release
 
 mkdir build
 cd build
