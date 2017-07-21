@@ -1,4 +1,5 @@
 language: c
+group: deprecated-2017Q3 # https://github.com/solvespace/solvespace/issues/266#issuecomment-316878182
 os:
   - linux
   - osx
