@@ -590,6 +590,7 @@ public:
     bool     drawBackFaces;
     bool     showContourAreas;
     bool     checkClosedContour;
+    bool     automaticLineConstraints;
     bool     showToolbar;
     Platform::Path screenshotFile;
     RgbaColor backgroundColor;
@@ -638,7 +639,7 @@ public:
     // as special requests.
     double tangentArcRadius;
     bool tangentArcManual;
-    bool tangentArcDeleteOld;
+    bool tangentArcModify;
 
     // The platform-dependent code calls this before entering the msg loop
     void Init();
@@ -692,6 +693,7 @@ public:
     void ExportAsPngTo(const Platform::Path &filename);
     void ExportMeshTo(const Platform::Path &filename);
     void ExportMeshAsStlTo(FILE *f, SMesh *sm);
+    void ExportMeshAsQ3doTo(FILE *f, SMesh *sm);
     void ExportMeshAsObjTo(FILE *fObj, FILE *fMtl, SMesh *sm);
     void ExportMeshAsThreeJsTo(FILE *f, const Platform::Path &filename,
                                SMesh *sm, SOutlineList *sol);

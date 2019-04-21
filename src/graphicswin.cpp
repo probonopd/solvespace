@@ -344,8 +344,8 @@ static void PopulateMenuWithPathnames(Platform::MenuRef menu,
         menuItem->SetEnabled(false);
     } else {
         for(Platform::Path pathname : pathnames) {
-            Platform::MenuItemRef menuItem = menu->AddItem(pathname.raw);
-            menuItem->onTrigger = [=]() { onTrigger(pathname); };
+            Platform::MenuItemRef menuItem = menu->AddItem(pathname.raw,
+                [=]() { onTrigger(pathname); }, /*mnemonics=*/false);
         }
     }
 }
@@ -390,6 +390,7 @@ void GraphicsWindow::Init() {
 
     showSnapGrid = false;
     context.active = false;
+    toolbarHovered = Command::NONE;
 
     if(!window) {
         window = Platform::CreateWindow();
@@ -702,7 +703,8 @@ void GraphicsWindow::MenuView(Command id) {
             if(SS.GW.LockedInWorkplane()) {
                 SS.GW.AnimateOntoWorkplane();
                 break;
-            }  // if not in 2d mode fall through and use ORTHO logic
+            }  // if not in 2d mode use ORTHO logic
+            // fallthrough
         case Command::NEAREST_ORTHO:
         case Command::NEAREST_ISO: {
             static const Vector ortho[3] = {
@@ -1283,26 +1285,27 @@ void GraphicsWindow::ToggleBool(bool *v) {
 }
 
 bool GraphicsWindow::SuggestLineConstraint(hRequest request, Constraint::Type *type) {
-    if(LockedInWorkplane()) {
-        Entity *ptA = SK.GetEntity(request.entity(1)),
-               *ptB = SK.GetEntity(request.entity(2));
+    if(!(LockedInWorkplane() && SS.automaticLineConstraints))
+        return false;
 
-        Expr *au, *av, *bu, *bv;
+    Entity *ptA = SK.GetEntity(request.entity(1)),
+           *ptB = SK.GetEntity(request.entity(2));
 
-        ptA->PointGetExprsInWorkplane(ActiveWorkplane(), &au, &av);
-        ptB->PointGetExprsInWorkplane(ActiveWorkplane(), &bu, &bv);
+    Expr *au, *av, *bu, *bv;
 
-        double du = au->Minus(bu)->Eval();
-        double dv = av->Minus(bv)->Eval();
+    ptA->PointGetExprsInWorkplane(ActiveWorkplane(), &au, &av);
+    ptB->PointGetExprsInWorkplane(ActiveWorkplane(), &bu, &bv);
 
-        const double TOLERANCE_RATIO = 0.02;
-        if(fabs(dv) > LENGTH_EPS && fabs(du / dv) < TOLERANCE_RATIO) {
-            *type = Constraint::Type::VERTICAL;
-            return true;
-        } else if(fabs(du) > LENGTH_EPS && fabs(dv / du) < TOLERANCE_RATIO) {
-            *type = Constraint::Type::HORIZONTAL;
-            return true;
-        }
+    double du = au->Minus(bu)->Eval();
+    double dv = av->Minus(bv)->Eval();
+
+    const double TOLERANCE_RATIO = 0.02;
+    if(fabs(dv) > LENGTH_EPS && fabs(du / dv) < TOLERANCE_RATIO) {
+        *type = Constraint::Type::VERTICAL;
+        return true;
+    } else if(fabs(du) > LENGTH_EPS && fabs(dv / du) < TOLERANCE_RATIO) {
+        *type = Constraint::Type::HORIZONTAL;
+        return true;
     }
     return false;
 }

@@ -293,6 +293,7 @@ void GraphicsWindow::MouseMoved(double x, double y, bool leftDown,
             } else {
                 SS.GW.pending.hasSuggestion = false;
             }
+            // fallthrough
         case Pending::DRAGGING_NEW_POINT:
             UpdateDraggedPoint(pending.point, x, y);
             HitTestMakeSelection(mp);
@@ -1107,7 +1108,7 @@ void GraphicsWindow::MouseLeftDown(double mx, double my) {
                     AddToPending(hr);
                     Request *r = SK.GetRequest(hr);
                     r->str = "Abc";
-                    r->font = "arial.ttf";
+                    r->font = "BitstreamVeraSans-Roman-builtin.ttf";
 
                     SK.GetEntity(hr.entity(1))->PointForceTo(v);
                     SK.GetEntity(hr.entity(2))->PointForceTo(v);

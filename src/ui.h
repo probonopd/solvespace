@@ -58,7 +58,7 @@ inline const char *C_(const char *msgctxt, const char *msgid) {
 }
 #endif
 
-// This table describes the top-level menus in the graphics winodw.
+// This table describes the top-level menus in the graphics window.
 enum class Command : uint32_t {
     NONE = 0,
     // File
@@ -291,7 +291,7 @@ public:
         GROUP_SCALE           = 3,
         GROUP_COLOR           = 4,
         GROUP_OPACITY         = 5,
-        // For the configuraiton screen
+        // For the configuration screen
         LIGHT_DIRECTION       = 100,
         LIGHT_INTENSITY       = 101,
         COLOR                 = 102,
@@ -425,6 +425,7 @@ public:
     static void ScreenChangeBackFaces(int link, uint32_t v);
     static void ScreenChangeShowContourAreas(int link, uint32_t v);
     static void ScreenChangeCheckClosedContour(int link, uint32_t v);
+    static void ScreenChangeAutomaticLineConstraints(int link, uint32_t v);
     static void ScreenChangePwlCurves(int link, uint32_t v);
     static void ScreenChangeCanvasSizeAuto(int link, uint32_t v);
     static void ScreenChangeCanvasSize(int link, uint32_t v);
@@ -668,8 +669,8 @@ public:
         Vector TangentAt(double t);
         double LengthForAuto();
 
-        hRequest CreateRequestTrimmedTo(double t, bool extraConstraints,
-            hEntity orig, hEntity arc, bool arcFinish);
+        void CreateRequestTrimmedTo(double t, bool reuseOrig,
+            hEntity orig, hEntity arc, bool arcFinish, bool pointf);
         void ConstrainPointIfCoincident(hEntity hpt);
     };
     void MakeTangentArc();
@@ -718,6 +719,7 @@ public:
     void HitTestMakeSelection(Point2d mp);
     void ClearSelection();
     void ClearNonexistentSelectionItems();
+    /// This structure is filled by a call to GroupSelection().
     struct {
         std::vector<hEntity>     point;
         std::vector<hEntity>     entity;
@@ -740,7 +742,7 @@ public:
         int         stylables;
         int         constraintLabels;
         int         withEndpoints;
-        int         n;
+        int         n;                 ///< Number of selected items
     } gs;
     void GroupSelection();
     bool IsSelected(Selection *s);

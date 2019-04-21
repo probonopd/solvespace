@@ -277,7 +277,7 @@ void OpenGl3Renderer::InvalidatePixmap(std::shared_ptr<const Pixmap> pm) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     }
 
-    GLenum format;
+    GLenum format = 0;
     switch(pm->format) {
         case Pixmap::Format::RGBA: format = GL_RGBA;  break;
         case Pixmap::Format::RGB:  format = GL_RGB;   break;
@@ -340,7 +340,7 @@ void OpenGl3Renderer::DoStippledLine(const Vector &a, const Vector &b, hStroke h
         return;
     }
 
-    const char *patternSeq;
+    const char *patternSeq = NULL;
     Stroke s = *stroke;
     s.stipplePattern = StipplePattern::CONTINUOUS;
     hcs = GetStroke(s);
@@ -634,7 +634,7 @@ void OpenGl3Renderer::NewFrame() {
     glClearDepthf(1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glPolygonOffset(2.0, 1.0);
+    glFrontFace(GL_CW);
 }
 
 void OpenGl3Renderer::FlushFrame() {
@@ -886,14 +886,10 @@ public:
     }
 
     void Draw(OpenGl3Renderer *renderer) override {
-        glEnable(GL_POLYGON_OFFSET_FILL);
         glEnable(GL_CULL_FACE);
-
         if(hasFillBack)
-            DrawFace(renderer, GL_FRONT, fillBack);
-        DrawFace(renderer, GL_BACK, fillFront);
-
-        glDisable(GL_POLYGON_OFFSET_FILL);
+            DrawFace(renderer, GL_BACK, fillBack);
+        DrawFace(renderer, GL_FRONT, fillFront);
         glDisable(GL_CULL_FACE);
     }
 

@@ -345,12 +345,13 @@ public:
     std::vector<std::shared_ptr<MenuImplGtk>>       subMenus;
 
     MenuItemRef AddItem(const std::string &label,
-                        std::function<void()> onTrigger = NULL) override {
+                        std::function<void()> onTrigger = NULL,
+                        bool mnemonics = true) override {
         auto menuItem = std::make_shared<MenuItemImplGtk>();
         menuItems.push_back(menuItem);
 
-        menuItem->gtkMenuItem.set_label(PrepareMnemonics(label));
-        menuItem->gtkMenuItem.set_use_underline(true);
+        menuItem->gtkMenuItem.set_label(mnemonics ? PrepareMnemonics(label) : label);
+        menuItem->gtkMenuItem.set_use_underline(mnemonics);
         menuItem->gtkMenuItem.show();
         menuItem->onTrigger = onTrigger;
         gtkMenu.append(menuItem->gtkMenuItem);
@@ -1166,8 +1167,8 @@ public:
         shownMessageDialogs.push_back(shared_from_this());
 
         gtkDialog.signal_response().connect([this](int gtkResponse) {
-            gtkDialog.hide();
             ProcessResponse(gtkResponse);
+            gtkDialog.hide();
         });
         gtkDialog.show();
     }

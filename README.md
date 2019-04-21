@@ -53,15 +53,23 @@ To build the GUI, you will need fontconfig, gtkmm 3.0 (version 3.16 or later), p
 OpenGL and OpenGL GLU, and optionally, the Space Navigator client library.
 On a Debian derivative (e.g. Ubuntu) these can be installed with:
 
-    apt-get install git build-essential cmake zlib1g-dev libpng-dev libcairo2-dev libfreetype6-dev
-    apt-get install libjson-c-dev libfontconfig1-dev libgtkmm-3.0-dev libpangomm-1.4-dev \
-                    libgl-dev libglu-dev libspnav-dev
+    sudo apt install git build-essential cmake zlib1g-dev libpng-dev \
+                     libcairo2-dev libfreetype6-dev libjson-c-dev \
+                     libfontconfig1-dev libgtkmm-3.0-dev libpangomm-1.4-dev \
+                     libgl-dev libglu-dev libspnav-dev
+
+On a Redhat derivative (e.g. Fedora) the dependencies can be installed with:
+
+    sudo dnf install git gcc-c++ cmake zlib-devel libpng-devel \
+                     cairo-devel freetype-devel json-c-devel \
+                     fontconfig-devel gtkmm30-devel pangomm-devel \
+                     mesa-libGL-devel mesa-libGLU-devel libspnav-devel
 
 Before building, check out the project and the necessary submodules:
 
     git clone https://github.com/solvespace/solvespace
     cd solvespace
-    git submodule update --init extlib/libdxfrw
+    git submodule update --init extlib/libdxfrw extlib/flatbuffers extlib/q3d
 
 After that, build SolveSpace as following:
 
@@ -86,7 +94,7 @@ Before building, check out the project and the necessary submodules:
 
     git clone https://github.com/solvespace/solvespace
     cd solvespace
-    git submodule update
+    git submodule update --init
 
 After that, build 32-bit SolveSpace as following:
 
@@ -108,6 +116,9 @@ The graphical interface is built as `build/bin/solvespace.exe`, and the command-
 is built as `build/bin/solvespace-cli.exe`.
 
 Space Navigator support will not be available.
+
+If using Ubuntu to cross-compile, Ubuntu 17.10 or newer (or, alternatively, MinGW from the Ubuntu
+17.10 repositories) is required.
 
 Building on macOS
 -----------------
@@ -158,7 +169,7 @@ Before building, check out the project and the necessary submodules:
 
     git clone https://github.com/solvespace/solvespace
     cd solvespace
-    git submodule update --init extlib/libdxfrw
+    git submodule update --init extlib/libdxfrw extlib/flatbuffers extlib/q3do
 
 After that, build SolveSpace as following:
 
@@ -228,4 +239,6 @@ and debug SolveSpace.
 License
 -------
 
-SolveSpace is distributed under the terms of the [GPL3 license](COPYING.txt).
+SolveSpace is distributed under the terms of the [GPL v3 license](COPYING.txt). It is possible
+to license SolveSpace for use in a commercial application; to do so,
+[contact](http://solvespace.com/contact.pl) the developers.
