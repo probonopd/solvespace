@@ -4,32 +4,31 @@
 // Copyright 2008-2013 Jonathan Westhues.
 //-----------------------------------------------------------------------------
 
-#ifndef __SOLVESPACE_H
-#define __SOLVESPACE_H
+#ifndef SOLVESPACE_H
+#define SOLVESPACE_H
 
-#include <stdint.h>
-#include <stdlib.h>
 #include <ctype.h>
-#include <string.h>
-#include <stdio.h>
-#include <stddef.h>
-#include <stdarg.h>
-#include <setjmp.h>
+#include <limits.h>
 #include <math.h>
 #include <setjmp.h>
-#include <limits.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <algorithm>
+#include <chrono>
 #include <functional>
-#include <memory>
-#include <string>
 #include <locale>
-#include <vector>
+#include <map>
+#include <memory>
+#include <set>
+#include <sstream>
+#include <string>
 #include <unordered_map>
 #include <unordered_set>
-#include <map>
-#include <set>
-#include <chrono>
-#include <sstream>
+#include <vector>
 
 // We declare these in advance instead of simply using FT_Library
 // (defined as typedef FT_LibraryRec_* FT_Library) because including
@@ -39,6 +38,7 @@ struct FT_LibraryRec_;
 struct FT_FaceRec_;
 
 typedef struct _cairo cairo_t;
+typedef struct _cairo_surface cairo_surface_t;
 
 // The few floating-point equality comparisons in SolveSpace have been
 // carefully considered, so we disable the -Wfloat-equal warning for them
@@ -57,7 +57,7 @@ typedef struct _cairo cairo_t;
 #define ssassert(condition, message) \
     do { \
         if(__builtin_expect((condition), true) == false) { \
-            SolveSpace::assert_failure(__FILE__, __LINE__, __func__, #condition, message); \
+            SolveSpace::AssertFailure(__FILE__, __LINE__, __func__, #condition, message); \
             __builtin_unreachable(); \
         } \
     } while(0)
@@ -65,7 +65,7 @@ typedef struct _cairo cairo_t;
 #define ssassert(condition, message) \
     do { \
         if((condition) == false) { \
-            SolveSpace::assert_failure(__FILE__, __LINE__, __func__, #condition, message); \
+            SolveSpace::AssertFailure(__FILE__, __LINE__, __func__, #condition, message); \
             abort(); \
         } \
     } while(0)
@@ -84,8 +84,8 @@ using std::swap;
 #if defined(__GNUC__)
 __attribute__((noreturn))
 #endif
-void assert_failure(const char *file, unsigned line, const char *function,
-                    const char *condition, const char *message);
+void AssertFailure(const char *file, unsigned line, const char *function,
+                   const char *condition, const char *message);
 
 #if defined(__GNUC__)
 __attribute__((__format__ (__printf__, 1, 2)))
@@ -130,89 +130,22 @@ class ExprVector;
 class ExprQuaternion;
 class RgbaColor;
 enum class Command : uint32_t;
-enum class ContextCommand : uint32_t;
 
 //================
 // From the platform-specific code.
 
 #include "platform/platform.h"
+#include "platform/gui.h"
 
 const size_t MAX_RECENT = 8;
 extern Platform::Path RecentFile[MAX_RECENT];
-void RefreshRecentMenus();
-
-enum DialogChoice { DIALOG_YES = 1, DIALOG_NO = -1, DIALOG_CANCEL = 0 };
-DialogChoice SaveFileYesNoCancel();
-DialogChoice LoadAutosaveYesNo();
-DialogChoice LocateImportedFileYesNoCancel(const Platform::Path &filename,
-                                           bool canCancel);
 
 #define AUTOSAVE_EXT "slvs~"
-
-enum class Unit : uint32_t {
-    MM = 0,
-    INCHES
-};
-
-struct FileFilter;
-
-bool GetSaveFile(Platform::Path *filename, const std::string &defExtension,
-                 const FileFilter filters[]);
-bool GetOpenFile(Platform::Path *filename, const std::string &defExtension,
-                 const FileFilter filters[]);
-std::vector<Platform::Path> GetFontFiles();
-
-void OpenWebsite(const char *url);
-
-void RefreshLocale();
-
-void CheckMenuByCmd(Command id, bool checked);
-void RadioMenuByCmd(Command id, bool selected);
-void EnableMenuByCmd(Command id, bool enabled);
-
-void ShowGraphicsEditControl(int x, int y, int fontHeight, int minWidthChars,
-                             const std::string &str);
-void HideGraphicsEditControl();
-bool GraphicsEditControlIsVisible();
-void ShowTextEditControl(int x, int y, const std::string &str);
-void HideTextEditControl();
-bool TextEditControlIsVisible();
-void MoveTextScrollbarTo(int pos, int maxPos, int page);
-
-void AddContextMenuItem(const char *legend, ContextCommand id);
-void CreateContextSubmenu();
-ContextCommand ShowContextMenu();
-
-void ShowTextWindow(bool visible);
-void InvalidateText();
-void InvalidateGraphics();
-void PaintGraphics();
-void ToggleFullScreen();
-bool FullScreenIsActive();
-void GetGraphicsWindowSize(int *w, int *h);
-void GetTextWindowSize(int *w, int *h);
-double GetScreenDpi();
-int64_t GetMilliseconds();
 
 void dbp(const char *str, ...);
 #define DBPTRI(tri) \
     dbp("tri: (%.3f %.3f %.3f) (%.3f %.3f %.3f) (%.3f %.3f %.3f)", \
         CO((tri).a), CO((tri).b), CO((tri).c))
-
-void SetCurrentFilename(const Platform::Path &filename);
-void SetMousePointerToHand(bool yes);
-void DoMessageBox(const char *str, int rows, int cols, bool error);
-void SetTimerFor(int milliseconds);
-void SetAutosaveTimerFor(int minutes);
-void ScheduleLater();
-void ExitNow();
-
-void CnfFreezeInt(uint32_t val, const std::string &name);
-void CnfFreezeFloat(float val, const std::string &name);
-void CnfFreezeString(const std::string &val, const std::string &name);
-std::string CnfThawString(const std::string &val, const std::string &name);
-uint32_t CnfThawInt(uint32_t val, const std::string &name);
-float CnfThawFloat(float val, const std::string &name);
 
 std::vector<std::string> InitPlatform(int argc, char **argv);
 
@@ -223,10 +156,16 @@ void *MemAlloc(size_t n);
 void MemFree(void *p);
 void vl(); // debug function to validate heaps
 
-#include "resource.h"
-
 // End of platform-specific functions
 //================
+
+#include "resource.h"
+
+enum class Unit : uint32_t {
+    MM = 0,
+    INCHES,
+    METERS
+};
 
 template<class T>
 struct CompareHandle {
@@ -275,6 +214,7 @@ public:
     utf8_iterator& operator++()    { **this; p=n; n=NULL; return *this; }
     utf8_iterator  operator++(int) { utf8_iterator t(*this); operator++(); return t; }
     char32_t       operator*();
+    const char*    ptr() const { return p; }
 };
 class ReadUTF8 {
     const std::string &str;
@@ -293,13 +233,10 @@ void MakeMatrix(double *mat, double a11, double a12, double a13, double a14,
                              double a41, double a42, double a43, double a44);
 void MultMatrix(double *mata, double *matb, double *matr);
 
-std::string MakeAcceleratorLabel(int accel);
-void Message(const char *str, ...);
-void Error(const char *str, ...);
-void CnfFreezeBool(bool v, const std::string &name);
-void CnfFreezeColor(RgbaColor v, const std::string &name);
-bool CnfThawBool(bool v, const std::string &name);
-RgbaColor CnfThawColor(RgbaColor v, const std::string &name);
+int64_t GetMilliseconds();
+void Message(const char *fmt, ...);
+void MessageAndRun(std::function<void()> onDismiss, const char *fmt, ...);
+void Error(const char *fmt, ...);
 
 class System {
 public:
@@ -646,13 +583,14 @@ public:
     double   exportChordTol;
     int      exportMaxSegments;
     double   cameraTangent;
-    float    gridSpacing;
-    float    exportScale;
-    float    exportOffset;
+    double   gridSpacing;
+    double   exportScale;
+    double   exportOffset;
     bool     fixExportColors;
     bool     drawBackFaces;
     bool     showContourAreas;
     bool     checkClosedContour;
+    bool     automaticLineConstraints;
     bool     showToolbar;
     Platform::Path screenshotFile;
     RgbaColor backgroundColor;
@@ -661,22 +599,22 @@ public:
     bool     exportCanvasSizeAuto;
     bool     exportMode;
     struct {
-        float   left;
-        float   right;
-        float   bottom;
-        float   top;
+        double  left;
+        double  right;
+        double  bottom;
+        double  top;
     }        exportMargin;
     struct {
-        float   width;
-        float   height;
-        float   dx;
-        float   dy;
+        double  width;
+        double  height;
+        double  dx;
+        double  dy;
     }        exportCanvas;
     struct {
-        float   depth;
+        double  depth;
         int     passes;
-        float   feed;
-        float   plungeFeed;
+        double  feed;
+        double  plungeFeed;
     }        gCode;
 
     Unit     viewUnits;
@@ -701,19 +639,17 @@ public:
     // as special requests.
     double tangentArcRadius;
     bool tangentArcManual;
-    bool tangentArcDeleteOld;
+    bool tangentArcModify;
 
     // The platform-dependent code calls this before entering the msg loop
     void Init();
-    bool Load(const Platform::Path &filename);
     void Exit();
 
     // File load/save routines, including the additional files that get
     // loaded when we have link groups.
     FILE        *fh;
     void AfterNewFile();
-    static void RemoveFromRecentList(const Platform::Path &filename);
-    static void AddToRecentList(const Platform::Path &filename);
+    void AddToRecentList(const Platform::Path &filename);
     Platform::Path saveFile;
     bool        fileLoadError;
     bool        unsaved;
@@ -735,12 +671,15 @@ public:
         Style        s;
     } sv;
     static void MenuFile(Command id);
-	bool Autosave();
+    void Autosave();
     void RemoveAutosave();
+    static const size_t MAX_RECENT = 8;
+    std::vector<Platform::Path> recentFiles;
+    bool Load(const Platform::Path &filename);
     bool GetFilenameAndSave(bool saveAs);
     bool OkayToStartNewFile();
     hGroup CreateDefaultDrawingGroup();
-    void UpdateWindowTitle();
+    void UpdateWindowTitles();
     void ClearExisting();
     void NewFile();
     bool SaveToFile(const Platform::Path &filename);
@@ -754,6 +693,7 @@ public:
     void ExportAsPngTo(const Platform::Path &filename);
     void ExportMeshTo(const Platform::Path &filename);
     void ExportMeshAsStlTo(FILE *f, SMesh *sm);
+    void ExportMeshAsQ3doTo(FILE *f, SMesh *sm);
     void ExportMeshAsObjTo(FILE *fObj, FILE *fMtl, SMesh *sm);
     void ExportMeshAsThreeJsTo(FILE *f, const Platform::Path &filename,
                                SMesh *sm, SOutlineList *sol);
@@ -852,14 +792,12 @@ public:
     // the sketch!
     bool allConsistent;
 
-    struct {
-        bool    scheduled;
-        bool    showTW;
-        bool    generateAll;
-    } later;
+    Platform::TimerRef showTWTimer;
+    Platform::TimerRef generateAllTimer;
+    Platform::TimerRef autosaveTimer;
     void ScheduleShowTW();
     void ScheduleGenerateAll();
-    void DoLater();
+    void ScheduleAutosave();
 
     static void MenuHelp(Command id);
 

@@ -22,6 +22,9 @@ New sketch features:
   * When adding a constraint which has a label and is redundant with another
     constraint, the constraint is added as a reference, avoiding an error.
   * Datum points can be copied and pasted.
+  * "Split Curves at Intersection" can now split curves at point lying on curve,
+    not just at intersection of two curves.
+  * Property browser now shows amount of degrees of freedom in group list.
 
 New constraint features:
   * When dragging an arc or rectangle point, it will be automatically
@@ -30,6 +33,8 @@ New constraint features:
     in the text window.
   * When selecting an entity, the constraints applied to it can be selected
     in the text window.
+  * It is now possible to turn off automatic creation of horizontal/vertical
+    constraints on line segments.
 
 New export/import features:
   * Three.js: allow configuring projection for exported model, and initially
@@ -37,6 +42,10 @@ New export/import features:
   * Wavefront OBJ: a material file is exported alongside the model, containing
     mesh color information.
   * DXF/DWG: 3D DXF files are imported as construction entities, in 3d.
+  * Q3D: [Q3D](https://github.com/q3k/q3d/) triangle meshes can now be
+    exported. This format allows to easily hack on triangle mesh data created
+    in SolveSpace, supports colour information and is more space efficient than
+    most other formats.
 
 New rendering features:
   * The "Show/hide hidden lines" button is now a tri-state button that allows
@@ -45,16 +54,18 @@ New rendering features:
   * The "Show/hide outlines" button is now independent from "Show/hide edges".
 
 New measurement/analysis features:
+  * New choice for base unit, meters.
   * New command for measuring total length of selected entities,
     "Analyze → Measure Perimeter".
   * New command for measuring center of mass, with live updates as the sketch
     changes, "Analyze → Center of Mass".
   * New option for displaying areas of closed contours.
-  * When selecting a point and a line, projected distance to to current
+  * When selecting a point and a line, projected distance to current
     workplane is displayed.
 
 Other new features:
   * New command-line interface, for batch exporting and more.
+  * The graphical interface now supports HiDPI screens on every OS.
   * New link to match the on-screen size of the sketch with its actual size,
     "view → set to full scale".
   * When zooming to fit, constraints are also considered.
@@ -64,6 +75,8 @@ Other new features:
     the entity from a request is selected. For example, dragging a point on
     a face of an extrusion coincident with the source sketch plane will
     drag the point from the source sketch.
+  * The default font for TTF text is now Bitstream Vera Sans, which is
+    included in the resources such that it is available on any OS.
   * In expressions, numbers can contain the digit group separator, "_".
   * The "=" key is bound to "Zoom In", like "+" key.
   * The numpad decimal separator key is bound to "." regardless of locale.
@@ -83,6 +96,10 @@ Bugs fixed:
   * A step rotate/translate group using a group forced to triangle mesh
     as a source group also gets forced to triangle mesh.
   * Paste Transformed with a negative scale does not invert arcs.
+  * The tangent arc now modifies the original entities instead of deleting
+    them, such that their constraints are retained.
+  * When linking a sketch file, missing custom styles are now imported from 
+    the linked file.
 
 2.x
 ---

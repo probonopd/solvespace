@@ -4,8 +4,8 @@
 //
 // Copyright 2008-2013 Jonathan Westhues.
 //-----------------------------------------------------------------------------
-#ifndef __EXPR_H
-#define __EXPR_H
+#ifndef SOLVESPACE_EXPR_H
+#define SOLVESPACE_EXPR_H
 
 class Expr {
 public:
@@ -96,8 +96,8 @@ public:
     Expr *DeepCopyWithParamsAsPointers(IdList<Param,hParam> *firstTry,
                                        IdList<Param,hParam> *thenTry) const;
 
-    static Expr *Parse(const char *input, std::string *error);
-    static Expr *From(const char *in, bool popUpError);
+    static Expr *Parse(const std::string &input, std::string *error);
+    static Expr *From(const std::string &input, bool popUpError);
 };
 
 class ExprVector {

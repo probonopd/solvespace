@@ -24,10 +24,10 @@ void main() {
     // calculate cap
     float dist = length(vec2(val * patternScale / (patternLen * width) + abs(fragLoc.x), fragLoc.y));
 
-    // perform antialising
+    // perform antialiasing
     float k = smoothstep(1.0 - 2.0 * feather * pixel / (width + feather * pixel), 1.0, abs(dist));
 
-    // perfrom alpha-test
+    // perform alpha-test
     if(k == 1.0) discard;
 
     // write resulting color
