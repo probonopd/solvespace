@@ -3,7 +3,7 @@ os:
   - linux
   - osx
 sudo: required
-dist: trusty
+dist: xenial
 osx_image: xcode8.2
 install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./.travis/install-debian.sh; fi
