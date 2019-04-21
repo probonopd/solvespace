@@ -23,3 +23,14 @@ deploy:
       repo: solvespace/solvespace
       tags: true
       condition: "$TRAVIS_OS_NAME == osx"
+
+# Instead of the following lines, the AppImage could be uploaded using the releases provider like the dmg
+
+after_success:
+  - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - bash upload.sh build/SolveSpace*.AppImage*
+  
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
