@@ -5,9 +5,7 @@ cd build
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr \
   -DCMAKE_C_COMPILER=gcc-5 \
-  -DCMAKE_CXX_COMPILER=g++-5 \
-  -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-  -DENABLE_SANITIZERS=ON
+  -DCMAKE_CXX_COMPILER=g++-5
 make -j$(nproc)
 make DESTDIR=appdir -j$(nproc) install ; find appdir/
 cp appdir/usr/share/icons/hicolor/48x48/apps/solvespace.png appdir/
