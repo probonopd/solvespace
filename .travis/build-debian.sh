@@ -16,4 +16,5 @@ sed -i -e 's|^Exec=.*|Exec=solvespace|g' appdir/usr/share/applications/solvespac
 wget -c -nv https://github.com/$(wget -q https://github.com/probonopd/go-appimage/releases -O - | grep "appimagetool-.*-x86_64.AppImage" | head -n 1 | cut -d '"' -f 2)
 chmod +x ./appimagetool-*.AppImage
 ./appimagetool-*.AppImage deploy appdir/usr/share/applications/*.desktop
+cp appdir/usr/share/icons/hicolor/48x48/apps/solvespace.png appdir/ # 128x128 or 256x256 would be better
 ./appimagetool-*.AppImage appdir/
