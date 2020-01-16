@@ -25,3 +25,8 @@ jobs:
         on:
           repo: solvespace/solvespace
           tags: true
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)/
